@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <title>boolfix</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PER LA VISUALIZZAZIONE -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <!-- PER GOOGLE FONTS -->
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous"/>
+    <!-- PER FONT AWESOME 5.15.1 -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <!-- PER AXIOS -->
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <!-- PER VUE 2 -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- PER IL MIO CSS -->
+
+    <script defer src="js/script.js" charset="utf-8"></script>
+    <!-- PER IL MIO JS -->
+
+  </head>
+  <body>
+    <!-- div.container mi serve, in particolare, a collegare l'html a vue -->
+    <div class="container">
+      <!-- l'header conterrà l'input text di ricerca e il relativo button -->
+      <header>
+        <!-- boolflix -->
+        <h1>BOOLFLIX</h1>
+        <!-- input text per la ricerca dei film -->
+        <input v-model="searchInput"
+        @input="search"
+        type="text"
+        autocomplete="off"
+        placeholder="Cerca un film o una serie tv"
+        onfocus="this.placeholder = ''"
+        onblur="this.placeholder = 'Cerca un film o una serie tv'"
+        name=""
+        value="">
+      </header>
+      <!-- il main conterrà le schede dei film e delle serie tv ricercati, e, per ognuno, in particolare, titolo, titolo originale, lingua, media dei voti e immagine di sfondo  -->
+      <main>
+        <!-- parte di intestazione dei film -->
+        <div class="what">
+          <h2>FILM</h2>
+        </div>
+        <!-- la ul films-or-tvs conterrà i film; ogni list item è un film -->
+        <ul class="films-or-tvs">
+          <!-- ciclo sui list items, in maniera tale che appaiano solo i film che hanno una corrispondenza rispetto alla ricerca effettuata -->
+          <li class="film-or-tv border"
+          v-for="(film, index) in films">
+            <p><strong>Titolo:</strong> {{film.title}}</p>
+            <p><strong>Titolo originale:</strong> {{film.original_title}}</p>
+            <!-- la src è bindata perché dipende da film.original_language; le immagini nella cartella img sono state opportunamente rinominate affinché ci sia una corrispondenza -->
+            <img class="flag"
+            @error="flagImgIsNotFound"
+            v-bind:src="'img/'+film.original_language+'.png'"
+            alt="bandiera">
+            <ul class="stars">
+              <p class="p-vote"><strong>Voto:</strong></p>
+              <!-- ciclo sul list item, così da crearne 5, ciascuno contenente 1 stella  -->
+							<li v-for="(star, index) in 5"
+              class="star">
+                <!-- se l'indice della stella (trasformato da 1 a 5, per poterlo confrontare con il valore di voteAverageModified) è maggiore di voteAverageModified, la stella è più "grande" del voto preso dal film, quindi sarà vuota; altrimenti sarà piena -->
+								<i class="fa-star"
+                v-bind:class="index + 1 > voteAverageFunction(film) ? 'far' : 'fas'"></i>
+							</li>
+						</ul>
+            <p><strong>Overview:</strong> {{film.overview}}</p>
+            <img class="backdrop"
+            @error="backdropImgIsNotFound"
+            v-bind:src="'http://image.tmdb.org/t/p/w500/'+film.poster_path" alt="">
+          </li>
+        </ul>
+        <!-- parte di intestazione delle serie tv -->
+        <div class="what">
+          <h2>SERIE TV</h2>
+        </div>
+        <!-- la ul films-or-tvs conterrà le serie tv; ogni list item è una serie tv -->
+        <ul class="films-or-tvs">
+          <!-- ciclo i list item, in maniera tale che appaiano solo le serie tv che hanno una corrispondenza rispetto alla ricerca effettuata -->
+          <li class="film-or-tv border"
+          v-for="(tv, index) in tvs">
+            <p><strong>Titolo:</strong> {{tv.name}}</p>
+            <p><strong>Titolo originale:</strong> {{tv.original_name}}</p>
+            <!-- la src è bindata perché dipende da tv.original_language; le immagini nella cartella img sono state opportunamente rinominate affinché ci sia una corrispondenza -->
+            <img class="flag"
+            @error="flagImgIsNotFound"
+            v-bind:src="'img/'+tv.original_language+'.png'"
+            alt="bandiera">
+            <ul class="stars">
+              <p class="p-vote"><strong>Voto:</strong></p>
+              <!-- ciclo sul list item, così da crearne 5, ciascuno contenente 1 stella  -->
+							<li v-for="(star, index) in 5"
+              class="star">
+                <!-- se l'indice della stella (trasformato da 1 a 5, per poterlo confrontare con il valore di voteAverageModified) è maggiore di voteAverageModified, la stella è più "grande" del voto preso dalla serie tv, quindi sarà vuota; altrimenti sarà piena -->
+								<i class="fa-star"
+                v-bind:class="index + 1 > voteAverageFunction(tv) ? 'far' : 'fas'"></i>
+							</li>
+						</ul>
+            <p><strong>Overview:</strong> {{tv.overview}}</p>
+            <img class="backdrop"
+            @error="backdropImgIsNotFound"
+            v-bind:src="'http://image.tmdb.org/t/p/w500/'+tv.poster_path" alt="">
+          </li>
+        </ul>
+      </main>
+    </div>
+  </body>
+</html>
